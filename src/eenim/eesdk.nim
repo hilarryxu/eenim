@@ -13,10 +13,19 @@
 ##
 ##  2013/01/10 First Version
 ##  2013/11/12 Update for EverEdit 3.0
+##  2014/03/19 Update for EverEdit 3.2.0(3548)
+##  2014/05/26 Update for 3.2.4.3696+
 ## ******************************************************************************
 
 import
   winapi, eecore
+
+## *
+##  @Msg:    execute a script
+##  @wparam: const wchar_t*: full path of script
+##  @lparam: BOOL: 0: execute with at least one document exists. 1: just execute
+##
+const EEM_EXCUTESCRIPT* = WM_USER+1203
 
 ## *
 ##  @Msg:    Restore layout of docking windows. This message will be sent from EE on startup, DO NOT send this message to EE!
@@ -85,24 +94,10 @@ const
   EEM_DOCKINGWINDOW* = WM_USER + 3004
 
 ## *
-##  @Msg:    Update UI element's state(Check/Uncheck/Disable/Enable). UI elements are menu/button items.
-##  @Return: void
-##  @wparam: int: ID of UI element
-##  @lparam: EE_UpdateUIElement*: You must set a valid value for nAction
-##
-
-const
-  EEM_UPDATEUIELEMENT* = WM_USER + 3004
-
-## *
-##  NOT IMPLEMENTED!
-##  @Msg:    Get a array which includes all handle of text document. Plugin should destroy this array after use
-##  @Return: HWND*: head address of this vector
-##  @wparam: int*: An integer to receive the size
-##
-
-const
-  EEM_GETHWNDLIST* = WM_USER + 3005
+##  @Msg:    Get an array which includes all handle of child frames (Text/Hex/Browser).
+##  @Return: int: The count of child frames
+##  @wparam: HWND*: A buffer to receive the handles. Set it to NULL to get the count of child frames.
+const EEM_GETFRAMELIST* =            WM_USER+3005
 
 ## *
 ##  NOT IMPLEMENTED!
@@ -133,13 +128,119 @@ const
   EEM_GETUIFONT* = WM_USER + 3008
 
 ## *
-##  EE_LoadFile.nViewType
+##  @Msg:    Update UI element's state(Check/Uncheck/Disable/Enable). UI elements are menu/button items.
+##  @Return: void
+##  @wparam: int: ID of UI element
+##  @lparam: EE_UpdateUIElement*: You must set a valid value for nAction
 ##
+const EEM_UPDATEUIELEMENT* =         WM_USER+3009
 
-const
-  WT_UNKNOWN* = 0
-  WT_TEXT* = 1
-  WT_HEX* = 2
+## *
+##  @Msg:    Output text to outputwindow
+##  @Return: void
+##  @wparam: wchar_t*: text
+##  @lparam: int*: length
+##
+const EEM_OUTPUTTEXT* =              WM_USER+3010
+
+
+## *
+##  @Msg:    Get handle of active output window
+##  @Return: HWND: it may be null, Set wparam to TRUE to show the outputwindow and then retrive the handle again.
+##  @wparam: BOOL: show or hide output window
+##
+const EEM_GETOUTPUTHWND* =           WM_USER+3011
+
+## *
+##  @Msg:    Get handle of document from child frame
+##  @Return: HWND: it may be null if can't get hwnd
+##  @wparam: HWND: handle of child frame, it must be a valid child frame
+##
+const EEM_GETDOCFROMFRAME* =   WM_USER+3012
+
+## *
+##  @Msg:    Popup a message box
+##  @Return: int:
+##  @wparam: MsgBoxData*
+##
+const EEM_MSGBOX* =     WM_USER+3013
+
+## *
+##  @Msg:    Paint a rect with app theme
+##  @wparam: HDC
+##  @lparam: RECT*
+##
+const EEM_PAINTWITHAPPTHEME* =  WM_USER+3014
+
+
+## *
+##  @Msg:    Set type of a textview
+##  @wparam: HWND: Child frame
+##  @lparam: int: value. (use 0xFF to get current value).
+##  TVT_DEFAULT=0
+##  TVT_GREP=1
+##  TVT_SORT=2
+##  TVT_SNIPPET=3
+##  TVT_REPLACE=4
+##  TVT_FTP=5
+##  TVT_RETURN=0xFF
+##
+const EEM_SETVIEWTYPE* =    WM_USER+3015
+
+## *
+##  @Msg: Get child frame from path name
+##  @Return: If this file was already opened then return the handle of frame, otherwise return 0
+##  @wparam: w_char*: full path name of file
+## */
+const EEM_GETFRAMEFROMPATH* =  WM_USER+3016
+
+## *
+##  @Msg: Get current frame type
+##  @Return: return an int value (FRAMETYPE_TEXT/FRAMETYPE_HEX/FRAMETYPE_UNKOWN)
+##  @wparam: HWND: Child frame
+## */
+const EEM_GETFRAMETYPE* =   WM_USER+3017
+
+## *
+##  @Msg: Get frame's path
+##  @Return: return full path name of view frame
+##  @wparam: HWND: Child frame
+## */
+const EEM_GETFRAMEPATH* =   WM_USER+3018
+
+## *
+##  @Msg: Get handle of active frame
+##  @Return: return the handle
+## */
+const EEM_GETACTIVEFRAME* =   WM_USER+3019
+
+## *
+##  @Msg: Get color table of application
+##  @Return: return the address of color table
+## */
+const EEM_GETAPPCOLORTBL* =   WM_USER+3020
+
+## *
+##  @Msg: Show a built-in dialog
+##  @wparam: int: dialog id
+##  @lparam: LPCTSTR: some strings
+##
+const EEM_SWOWDIALOG* =    WM_USER+3021
+
+## *
+##  @Msg: Query a docking window side
+##  @wparam: LPCTSTR: title of a docking window
+##  @lparam: int: side
+##
+const EEM_QUERYDOCKSIDE* =   WM_USER+3022
+
+## *
+##  @Msg: Query app metrics
+##  @wparam: see metrics enum
+##  @return: value
+##
+const EEM_GETAPPMETRICS* =   WM_USER+3023
+
 
 ## *
 ##  EE_UpdateUIElementn.Action
@@ -409,6 +510,107 @@ const
   EEHOOK_POSTDIRVIEWMENU* = 21
 
 ## *
+##  @Prototype:int OnPostPopupTextMenu(HWND hWndDoc, HMENU hMenu, int nCommand )
+##  @Vars:
+##   hWndDoc: Handle of current text document
+##   hMenu:   Handle of context menu
+##   nCommand:  Selected Command
+##
+##  Called after popuping context menu of current document.
+## /
+const EEHOOK_POSTTEXTMENU* =           22
+
+## *
+##  @Prototype:int OnAddTabPage(HWND hChildFrame)
+##  @Vars:
+##   hChildFrame: Handle of child frame
+## /
+const EEHOOK_ADDTABPAGE* =             23
+
+## *
+##  @Prototype:int OnRemoveTabPage(HWND hChildFrame)
+##  @Vars:
+##   hChildFrame: Handle of child frame
+## /
+const EEHOOK_REMOVETABPAGE* =          24
+
+## *
+##  @Prototype:int OnTabPageInfoChanged(HWND hChildFrame)
+##  @Vars:
+##   hChildFrame: Handle of child frame
+##
+##  Called after infomation of tab page changed, such as icon/title...
+## /
+const EEHOOK_TABPAGEINFOCHANGED* =     25
+
+## *
+##  @Prototype:int OnTabPageSelChanged(HWND hOldFrame, HWND hNewFrame)
+##  @Vars:
+##   hOldFrame: Handle of old child frame
+##   hNewFrame: Handle of new child frame
+##
+## /
+const EEHOOK_TABPAGESELCHANGED* =      26
+
+## *
+##  @Prototype:int OnTextIdle(HWND hWnd)
+##  @Vars:
+##   hWnd:  Handle of active document
+##
+##  Idle message. Plugin can update UI element's state of document here! DO NOT do complicated operations in this hook!
+## /
+const EEHOOK_TEXTIDLE* =               27
+
+## *
+##  @Prototype:int OnRestoreDockingWindow(const wchar_t* caption, int side)
+##  @Vars:
+##   const wchar_t*: Caption of docking window. Plugin can restore itself by this param.
+##   side: this docking window should be in [side]
+##
+## /
+const EEHOOK_RESTOREDOCKINGWINDOW* =   28
+
+## *
+##  @Prototype:int OnListPluginCommand(HWND hWnd)
+##  @Vars:
+##   hWnd*: handle of list view control in shortcut dialog. Plugin should append items from subitem 1
+##              subitem 0: DON'T insert text here
+##              subitem 1: title of this command, it must be pl_xxxxxxxx
+##       subimte 2: short description
+##       subimte 3: long description
+## /
+const EEHOOK_LISTPLUGINCOMMAND* =   29
+
+## *
+##  @Prototype:int OnExecutePluginCommand(const wchar_t* command)
+##  @Vars:
+##   const wchar_t*: command title
+## /
+const EEHOOK_EXECUTEPLUGINCOMMAND* =   30
+
+## *
+##  @Prototype:int OnMenuSelect(int id, wchar_t* text, int length)
+##  @Vars:
+##   id: menu id
+##   text*: a buffer to hold the description of this menu id
+##   length: length of buffer
+##
+##  Called on mouse hover items of popup menu(Note: this menu be popuped from mainframe)
+## /
+const EEHOOK_MENUSELECT* =      31
+
+## *
+##  @Prototype:int OnSettingChanged(DWORD dialog, DWORD control)
+##  @Vars:
+##   dialog: dialog id
+##   control: control id
+##
+##  Called after user changed some settings(Theme, Font, etc..)
+## /
+const EEHOOK_SETTINGCHANGED* =     32
+
+
+## *
 ##  @Prototype:int OnInputText(HWND hWnd, wchar_t* text)
 ##  @Vars:
 ## 		hWnd:	Handle of text window
@@ -493,8 +695,28 @@ const
 ##  Hook function can return this message to stop routing message!
 ##
 
+## *
+##  @Prototype:int OnPostSaveHexFile(HWND hChildFrame)
+##  @Vars:
+## 		hChildFrame: 	Handle of current hex child frame
+##
+##  Called after saving a hex document
+## /
+const EEHOOK_POSTSAVEHEX* =            107
+
+
+## *
+##  @Prototype:int OnPreExecuteScript(const wchar_t* pathname)
+##  @Vars:
+## 		hChildFrame: 	Handle of current hex child frame
+##
+##  Called before executing a script, so plugin can hook this message and add pythong/lua native support
+## /
+const EEHOOK_PREEXECUTESCRIPT* =       108
+
+
 const
-  EEHOOK_RET_DONTROUTE* = 0x00000000
+  EEHOOK_RET_DONTROUTE* = 0xBC614E
 
 ## *
 ##  Position of docking window
@@ -520,10 +742,12 @@ type
     hStartPage*: HWND          ##  Start page
     hMainMenu*: HMENU          ##  Main menu
     hPluginMenu*: HMENU        ##  Plugin menu
-    pCommand*: ptr DWORD        ##  Command value. Plugin reserves some commands and set a new value for other plugins
+    pCommand*: ptr DWORD       ##  invalid from 3.20
+    dwCommand*: DWORD          ##  Command value. Plugin reserves some commands and set a new value for other plugins
     dwVersion*: DWORD          ##  Version info
     dwBuild*: DWORD            ##  Build info
-    dwLCID*: DWORD              ##  LCID
+    dwLCID*: DWORD             ##  LCID
+    hModule*: HMODULE
 
 
 ## *
@@ -544,7 +768,25 @@ type
   EE_LoadFile* {.bycopy.} = object
     nCodepage*: cint           ##  Codepage of file
     nViewType*: cint           ##  View's type
-    bReadOnly*: WINBOOL           ##  Is read-only?
+    bReadOnly*: WINBOOL        ##  Is read-only?
+    bAddToMRU*: WINBOOL        ##  Add it into MRU?
+    bAsynMode*: WINBOOL        ##  Load file asynchronously
+
+
+## *
+##  EE_LoadFile.nViewType
+##
+
+const
+  WT_UNKNOWN* = 0
+  WT_TEXT* = 1
+  WT_HEX* = 2
+
+## EEM_GETFRAMETYPE
+const
+  FRAMETYPE_UNKOWN* = 0
+  FRAMETYPE_TEXT* = 1
+  FRAMETYPE_HEX* = 2
 
 
 ## *
@@ -574,7 +816,7 @@ type
 type
   AutoWordInput* {.bycopy.} = object
     pos*: ptr EC_Pos            ##  caret pos
-    lpHintText*: LPCWSTR    ##  User is inputting some texts
+    lpHintText*: LPCWSTR        ##  User is inputting some texts
     nLength*: cint
 
 
@@ -598,5 +840,15 @@ type
   WebPreviewData* {.bycopy.} = object
     lpPathName*: LPCWSTR    ##  full path
     lpCharset*: LPCWSTR     ##  Not used!
-    bCanDelete*: bool          ##  Can be delete after closing EverEdit?
+    bCanDelete*: bool       ##  Can be delete after closing EverEdit?
+    bSplitGroup*: bool      ##  show in split group
 
+## MsgBox
+type
+  MsgBoxData* {.bycopy.} = object
+    lpMsg*: LPCWSTR
+    lpCaption*: LPCWSTR
+    hWnd*: HWND
+    dwFlag*: DWORD
+
+const EE_METRIC_TOOLBARICONSIZE* = 1

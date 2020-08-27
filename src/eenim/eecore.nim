@@ -11,6 +11,7 @@ import winapi
 ##
 ##  2013/01/10 First Version
 ##  2013/11/12 Update for EverEdit 3.0
+##  2014/05/26 Update for 3.2.4.3696+
 ## *****************************************************************************
 
 ## *
@@ -53,7 +54,7 @@ const
   EC_FDSTYLE_ARROW* = 3
   EC_FDSTYLE_BOXLINE* = 4
   EC_FDSTYLE_PENTAGON* = 5
-  EC_FDSTYLE_ICON* = 5
+  EC_FDSTYLE_ICON* = 5  ## NOT IMPLEMENTED
 
 ## *
 ##  Edit Mode
@@ -62,6 +63,10 @@ const
 const
   EC_EDITMODE_NORMAL* = 0
   EC_EDITMODE_OVERWRITE* = 1
+  EC_EDITMODE_COLUMN* = 2
+  EC_EDITMODE_MULTIPLE* = 3
+  EC_EDITMODE_VIRTUALSPACE* = 4
+  EC_EDITMODE_RETURN* = 0xFF
 
 ## *
 ##  Line Wrap Mode
@@ -73,7 +78,43 @@ const
   EC_WRAP_SMART* = 2
   EC_WRAP_COL* = 3
   EC_WRAP_EXPANDTAB* = 4
-  EC_WRAP_GETWRAPDATA* = 11
+  EC_WRAP_GETWRAPDATA* = 11  ## get wrap data of EC_WRAP_COL and EC_WRAP_EXPANDTAB
+
+##
+## Syntax State
+##
+const
+  CS_DEFAULT* = 0
+  CS_COMMENT1* = 1
+  CS_COMMENT2* = 2
+  CS_STRING1* = 3
+  CS_STRING2* = 4
+  CS_TAG* = 5
+  CS_MACRO* = 6
+  CS_URL* = 7
+  CS_EMAIL* = 8
+  CS_NUMBER* = 9
+  CS_FOUND* = 10
+  CS_PAIR* = 11
+  CS_FUNCTION* = 12
+  CS_VAR* = 13
+  CS_SUBLAN* = 14
+  CS_OPERATOR* = 15
+  CS_WORD1* = 16
+  CS_WORD2* = 17
+  CS_WORD3* = 18
+  CS_WORD4* = 19
+  CS_HIGHLIGHT1* = 20
+  CS_HIGHLIGHT2* = 21
+  CS_HIGHLIGHT3* = 22
+  CS_HIGHLIGHT4* = 23
+  CS_HIGHLIGHT5* = 24
+  CS_HIGHLIGHT6* = 25
+  CS_HIGHLIGHT7* = 26
+  CS_HIGHLIGHT8* = 27
+  CS_IGNORE* = 29
+  CS_CONCEAL* = 30
+  CS_LAST* = 32
 
 ## *
 ##  Move Caret and Selection Commands
@@ -127,7 +168,7 @@ const
   ECC_COPY* = 33
   ECC_PASTE* = 34
   ECC_CUT* = 35
-  ECC_TOGGLEINSOVR* = 36
+  ECC_TOGGLEINSOVR* = 36  ## Toggle overwrite/insert mode
 
 ## *
 ##  Scroll up or down without moving caret
@@ -683,6 +724,24 @@ const
   ECM_FOLDINGSTYLE* = WM_USER + 90
 
 ## *
+##  @Msg: 	Close un-closed html/xml tag on caret position
+##  @Return: BOOL: Return true if success, otherwise return false
+##
+const ECM_CLOSETAG* = WM_USER+105
+
+## *
+##  @Msg: 	Is current view loading document?
+##  @Return: BOOL
+##
+const ECM_ISLOADING* = WM_USER+106
+
+## *
+##  @Msg: 	Insert text with column mode
+##  @Return: BOOL: Return true if success, otherwise return false
+##
+const ECM_INSERTCOLTEXT* = WM_USER+120
+
+## *
 ##  Notify Messages
 ##
 
@@ -756,3 +815,5 @@ type
     epos*: EC_Pos
     lpText*: LPCWSTR
 
+  CharStyle* {.bycopy.} = object
+    state* {.bitsize:5.}: uint16
