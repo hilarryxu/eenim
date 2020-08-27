@@ -584,7 +584,7 @@ type
 
 type
   AutoWordList* {.bycopy.} = object
-    lpWords*: ptr PWideChar    ##  words
+    lpWords*: LPCWSTR          ##  words
     nCount*: cint              ##  count
     hIcon*: HICON              ##  Not used!
     id*: DWORD                 ##  ID

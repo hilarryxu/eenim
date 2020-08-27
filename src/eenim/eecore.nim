@@ -453,7 +453,7 @@ const
 ## *
 ##  @Msg:    Set tab size
 ##  @Return: int: Current tab size
-##  @wparam: >=1&&<=64:Set, <=0£ºGet
+##  @wparam: >=1&&<=64:Set, <=0ï¼šGet
 ##
 
 const

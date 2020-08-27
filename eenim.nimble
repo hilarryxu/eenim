@@ -1,14 +1,14 @@
 # Package
 
-version       = "0.1.0"
+version       = "0.2.0"
 author        = "Larry Xu"
 description   = "Nim plugin sample for everedit."
 license       = "MIT"
+srcDir        = "src"
+bin           = @["eenim.dll"]
 
-bin = @["eenim.dll"]
-srcDir = "src"
+
 
 # Dependencies
 
-requires "nim >= 0.13.0"
-# requires "wNim"
+requires "nim >= 1.0.0"

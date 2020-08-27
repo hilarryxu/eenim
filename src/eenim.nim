@@ -1,5 +1,5 @@
 import
-  eenimpkg/winapi, eenimpkg/eesdk
+  eenim/winapi, eenim/eesdk
 
 var
   gEEModule : HANDLE = NULL
@@ -28,5 +28,5 @@ proc DllMain(hModule: HANDLE, reasonForCall: DWORD, lpReserved: LPVOID): WINBOOL
   result = TRUE
 
 proc EE_PluginInit(context: ptr EE_Context): DWORD {.cdecl, exportc, dynlib.} =
-  discard messageBox(NULL, "eenim", "About", MB_OK)
+  # discard messageBox(NULL, "eenim", "About", MB_OK)
   return 0
