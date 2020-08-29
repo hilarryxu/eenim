@@ -34,3 +34,15 @@ const
   DLL_THREAD_DETACH* = 3
 
   WM_USER* = 1024
+
+when defined(useWinUnicode):
+  proc WC*(s: string): LPCWSTR =
+    if s.len == 0: return cast[LPCWSTR](0)
+    let x = newWideCString(s)
+    result = cast[LPCWSTR](x)
+else:
+  template WC*(s: string): cstring = s.cstring
+
+when defined(useWinUnicode):
+  proc messageBoxW*(hWnd: HWND, lpText: WideCString, lpCaption: WideCString, uType: WINUINT): cint {.
+    importc: "MessageBoxW", dynlib: "kernel32", stdcall.}

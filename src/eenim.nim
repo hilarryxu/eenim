@@ -1,23 +1,26 @@
 import
-  eenim/winapi, eenim/eesdk
+  eenim/winapi, eenim/eesdk,
+  eenim/init_lua
 
 var
-  gEEModule : HANDLE = NULL
+  g_EEModule : Handle = NULL
 
 proc NimMain() {.cdecl, importc.}
 
-proc pluginInit(hModule: HMODULE) =
-  gEEModule = hModule
+proc dllInit(hModule: Handle) =
+  g_EEModule = hModule
 
-proc pluginCleanUp() = discard
+proc dllCleanup() = discard
 
-proc DllMain(hModule: HANDLE, reasonForCall: DWORD, lpReserved: LPVOID): WINBOOL {.stdcall, exportc, dynlib.} =
+proc DllMain(hModule: Handle, reasonForCall: DWORD,
+             lpReserved: LPVOID): WINBOOL
+            {.stdcall, exportc, dynlib.} =
   case reasonForCall
   of DLL_PROCESS_ATTACH:
     NimMain()
-    pluginInit(hModule)
+    dllInit(hModule)
   of DLL_PROCESS_DETACH:
-    pluginCleanUp()
+    dllCleanup()
     discard
   of DLL_THREAD_ATTACH:
     discard
@@ -29,4 +32,9 @@ proc DllMain(hModule: HANDLE, reasonForCall: DWORD, lpReserved: LPVOID): WINBOOL
 
 proc EE_PluginInit(context: ptr EE_Context): DWORD {.cdecl, exportc, dynlib.} =
   # discard messageBox(NULL, "eenim", "About", MB_OK)
+  initLua(context)
+  return 0
+
+proc EE_PluginUninit(): DWORD {.cdecl, exportc, dynlib.} =
+  deinitLua()
   return 0
