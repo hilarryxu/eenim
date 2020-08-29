@@ -1,6 +1,5 @@
-import
-  eenim/winapi, eenim/eesdk,
-  eenim/init_lua
+import eenim/winapi, eenim/eesdk
+import eenim/init_lua
 
 var
   g_EEModule : Handle = NULL
@@ -31,10 +30,13 @@ proc DllMain(hModule: Handle, reasonForCall: DWORD,
   result = TRUE
 
 proc EE_PluginInit(context: ptr EE_Context): DWORD {.cdecl, exportc, dynlib.} =
-  # discard messageBox(NULL, "eenim", "About", MB_OK)
+  # discard MessageBoxA(NULL, "eelua", "About eelua", MB_OK)
   initLua(context)
   return 0
 
 proc EE_PluginUninit(): DWORD {.cdecl, exportc, dynlib.} =
   deinitLua()
+  return 0
+
+proc EE_PluginInfo(text: LPCWSTR, len: cint): DWORD {.cdecl, exportc, dynlib.} =
   return 0

@@ -1,5 +1,5 @@
 import strutils
-import lua
+import lua, winapi
 
 proc msghandler(L: PState): cint {.cdecl.} =
   var msg = L.checkstring(1)
@@ -16,7 +16,7 @@ proc luaH_report*(L: PState; status: cint): cint =
   # 栈顶为结果列表或错误消息
   if status != LUA_OK:
     let msg = L.tostring(-1)
-    # MainOutMessasge("[eelua] ERR: $1" % $msg)
+    OutputDebugStringA("[eelua] ERR: $1" % $msg)
     L.pop(1)  # 移除错误消息
   result = status
 

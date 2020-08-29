@@ -1,8 +1,8 @@
 # Package
 
-version       = "0.2.0"
+version       = "0.3.0"
 author        = "Larry Xu"
-description   = "Nim plugin sample for everedit."
+description   = "Lua plugin sample for everedit written in nim."
 license       = "MIT"
 srcDir        = "src"
 bin           = @["eenim.dll"]

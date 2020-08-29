@@ -6,7 +6,7 @@ var
   L*: PState
 
 proc run_eelua_init*(L: PState): cint {.cdecl.} =
-  let eelua_init_filename = "./eelua_init.lua"
+  let eelua_init_filename = "./eelua/eelua_init.lua"
   result = L.luaH_dofile(eelua_init_filename)
 
 proc initLua*(context: ptr EE_Context) =

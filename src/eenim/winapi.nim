@@ -35,6 +35,8 @@ const
 
   WM_USER* = 1024
 
+  MB_OK* = 0
+
 when defined(useWinUnicode):
   proc WC*(s: string): LPCWSTR =
     if s.len == 0: return cast[LPCWSTR](0)
@@ -44,5 +46,11 @@ else:
   template WC*(s: string): cstring = s.cstring
 
 when defined(useWinUnicode):
-  proc messageBoxW*(hWnd: HWND, lpText: WideCString, lpCaption: WideCString, uType: WINUINT): cint {.
-    importc: "MessageBoxW", dynlib: "kernel32", stdcall.}
+  proc MessageBoxW*(hWnd: HWND, lpText: WideCString, lpCaption: WideCString, uType: WINUINT): cint {.
+    importc: "MessageBoxW", dynlib: "user32", stdcall.}
+
+proc MessageBoxA*(hWnd: HWND, lpText: cstring, lpCaption: cstring, uType: WINUINT): cint {.
+  importc: "MessageBoxA", dynlib: "user32", stdcall.}
+
+proc OutputDebugStringA*(lpOutputString: cstring) {.
+  importc: "OutputDebugStringA", dynlib: "kernel32", stdcall.}

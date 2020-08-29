@@ -1,5 +1,5 @@
 import strutils
-import lua
+import lua, winapi
 
 when sizeof(int) > 4:
   const isX64 = true
@@ -8,7 +8,7 @@ else:
 
 proc Leelua_dprint(L: PState): cint {.cdecl.} =
   let msg = L.checkstring(1)
-  # MainOutMessasge($msg)
+  OutputDebugStringA(msg)
 
 
 proc luaopen_eelua*(L: PState): cint {.cdecl.} =
