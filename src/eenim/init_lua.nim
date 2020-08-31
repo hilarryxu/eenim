@@ -1,11 +1,6 @@
 import eesdk
 import lua, lua_helper, lfs, leelua
 
-when sizeof(int) > 4:
-  const isX64 = true
-else:
-  const isX64 = false
-
 var
   L*: PState
 
@@ -19,14 +14,6 @@ proc initLua*(context: ptr EE_Context) =
     L.openlibs
     L.pop(L.luaopen_lfs())
     discard L.luaopen_eelua()
-    L.pushbool(isX64)
-    L.setfield(-2, "x64")
-    when defined(release):
-      L.pushbool(false)
-      L.setfield(-2, "DEBUG")
-    else:
-      L.pushbool(true)
-      L.setfield(-2, "DEBUG")
     L.pushlightuserdata(context)
     L.setfield(-2, "_ee_context")
     L.pop(1)

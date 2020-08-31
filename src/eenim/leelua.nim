@@ -18,4 +18,10 @@ proc luaopen_eelua*(L: PState): cint {.cdecl.} =
   L.lregister("eelua", cast[ptr luaL_reg](addr(funcs)))
   L.pushbool(isX64)
   L.setfield(-2, "x64")
+  when defined(release):
+    L.pushbool(false)
+    L.setfield(-2, "DEBUG")
+  else:
+    L.pushbool(true)
+    L.setfield(-2, "DEBUG")
   result = 1
