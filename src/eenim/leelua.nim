@@ -1,4 +1,3 @@
-import strutils
 import lua, winapi
 
 when sizeof(int) > 4:

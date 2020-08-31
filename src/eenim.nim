@@ -1,5 +1,5 @@
 import eenim/winapi, eenim/eesdk
-import eenim/init_lua
+import eenim/lua, eenim/lua_helper, eenim/init_lua
 
 var
   g_EEModule : Handle = NULL
@@ -40,3 +40,12 @@ proc EE_PluginUninit(): DWORD {.cdecl, exportc, dynlib.} =
 
 proc EE_PluginInfo(text: LPCWSTR, len: cint): DWORD {.cdecl, exportc, dynlib.} =
   return 0
+
+proc dofile(context: ptr EE_Context; rect: LPRECT; text: pointer): DWORD {.cdecl, exportc, dynlib.} =
+  L.getglobal("OnDoFile")
+  L.pushlightuserdata(context)
+  L.pushlightuserdata(rect)
+  L.pushlightuserdata(text)
+  result = L.luaH_docall(3, 0, "OnDoFile")
+  if result == LUA_OK:
+    discard

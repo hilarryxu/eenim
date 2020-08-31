@@ -23,6 +23,15 @@ type
     idFrom*: WINUINT
     code*: WINUINT
 
+  RECT* {.final, pure.} = object
+    left*: LONG
+    top*: LONG
+    right*: LONG
+    bottom*: LONG
+
+  PRECT* = ptr RECT
+  LPRECT* = ptr RECT
+
 const
   TRUE* = 1
   FALSE* = 0
