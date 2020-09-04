@@ -57,6 +57,7 @@ function _M.get_size_ptr()
 end
 
 function _M.get_string_buf(size, must_alloc)
+  size = size or -1
   if size > str_buf_size or must_alloc then
     return ffi_new(c_buf_type, size)
   end
@@ -116,6 +117,10 @@ LRESULT SendMessageA(
   UINT   Msg,
   WPARAM wParam,
   LPARAM lParam
+);
+
+int lstrlenW(
+  const wchar_t* lpString
 );
 
 DWORD GetModuleFileNameA(
