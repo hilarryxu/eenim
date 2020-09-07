@@ -19,7 +19,7 @@ local ffi_cast = ffi.cast
 local str_fmt = string.format
 local _p = eelua.printf
 
-local ee_context = ffi_cast("EE_Context*", eelua._ee_context)
+ee_context = ffi_cast("EE_Context*", eelua._ee_context)
 local app_path_strbuf = base.get_string_buf()
 C.GetModuleFileNameA(ee_context.hModule, app_path_strbuf, base.get_string_buf_size())
 local app_path = path.getdirectory(path.getabsolute(ffi_str(app_path_strbuf)))

@@ -112,6 +112,11 @@ typedef struct {
   HMODULE hModule;
 } EE_Context;
 
+typedef struct {
+  int line;
+  int col;
+} EC_Pos;
+
 LRESULT SendMessageA(
   HWND   hWnd,
   UINT   Msg,
@@ -133,6 +138,9 @@ typedef int (__stdcall *pfnOnRunningCommand)(const wchar_t* command, int length)
 typedef int (*pfnOnAppMessage)(UINT uMsg, WPARAM wp, LPARAM lp);
 
 static const int WM_USER = 1024;
+static const int ECM_GETCARETPOS = WM_USER + 12;
+static const int ECM_GETLINEBUF = WM_USER + 15;
+
 static const int EEM_GETACTIVETEXT = WM_USER + 3000;
 static const int EEM_SETHOOK = WM_USER + 3003;
 
@@ -147,7 +155,12 @@ function eelua.printf(fmt, ...)
 end
 
 function _M.send_message(hwnd, msg, wparam, lparam)
-  return C.SendMessageA(hwnd, msg, wparam or 0, lparam or 0)
+  return C.SendMessageA(
+    ffi_cast("HWND", hwnd),
+    ffi_cast("UINT", msg),
+    wparam and ffi_cast("WPARAM", wparam) or 0,
+    lparam and ffi_cast("LPARAM", lparam) or 0
+  )
 end
 
 return _M
