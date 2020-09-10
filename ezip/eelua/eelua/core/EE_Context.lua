@@ -40,6 +40,15 @@ function _M:open_doc(filepath, codepage, view_type)
   return EE_Document.new(hwnd)
 end
 
+function _M:output_text(text)
+  local wstr, wlen = unicode.a2w(text)
+  send_message(self.hMain, C.EEM_OUTPUTTEXT, wstr, wlen)
+end
+
+function _M:output_line(text)
+  self:output_text(text .. "\n")
+end
+
 ffi.metatype("EE_Context", mt)
 
 return _M

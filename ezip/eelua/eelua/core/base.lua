@@ -155,6 +155,7 @@ static const int ECM_GETLINEBUF = WM_USER + 15;
 static const int EEM_GETACTIVETEXT = WM_USER + 3000;
 static const int EEM_LOADFILE = WM_USER + 3002;
 static const int EEM_SETHOOK = WM_USER + 3003;
+static const int EEM_OUTPUTTEXT = WM_USER + 3010;
 
 static const int EEHOOK_RUNCOMMAND = 13;
 static const int EEHOOK_APPMSG = 7;
