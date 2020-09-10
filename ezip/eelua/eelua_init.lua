@@ -20,6 +20,7 @@ local str_fmt = string.format
 local _p = eelua.printf
 
 ee_context = ffi_cast("EE_Context*", eelua._ee_context)
+App = ee_context
 local app_path_strbuf = base.get_string_buf()
 C.GetModuleFileNameA(ee_context.hModule, app_path_strbuf, base.get_string_buf_size())
 local app_path = path.getdirectory(path.getabsolute(ffi_str(app_path_strbuf)))
@@ -27,7 +28,7 @@ eelua.app_path = app_path
 
 OnDoFile = function(ctx, rect, wtext)
   local text = unicode.w2a(wtext, C.lstrlenW(wtext))
-  _p("OnDoFile('%s')", text)
+  -- _p("OnDoFile('%s')", text)
   local params = string.explode(text, "^^", true)
   local nparams = #params
   assert(nparams > 0)

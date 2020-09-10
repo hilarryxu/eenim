@@ -95,6 +95,7 @@ typedef intptr_t LONG_PTR;
 typedef LONG_PTR WPARAM;
 typedef LONG_PTR LPARAM;
 typedef LONG_PTR LRESULT;
+typedef int WINBOOL;
 
 typedef struct {
   HWND hMain;
@@ -116,6 +117,16 @@ typedef struct {
   int line;
   int col;
 } EC_Pos;
+
+typedef struct {
+  int nCodepage;
+  int nViewType;
+  WINBOOL bReadOnly;
+  WINBOOL bAddToMRU;
+  WINBOOL bAsynMode;
+} EE_LoadFile;
+
+void free(void *ptr);
 
 LRESULT SendMessageA(
   HWND   hWnd,
@@ -142,6 +153,7 @@ static const int ECM_GETCARETPOS = WM_USER + 12;
 static const int ECM_GETLINEBUF = WM_USER + 15;
 
 static const int EEM_GETACTIVETEXT = WM_USER + 3000;
+static const int EEM_LOADFILE = WM_USER + 3002;
 static const int EEM_SETHOOK = WM_USER + 3003;
 
 static const int EEHOOK_RUNCOMMAND = 13;
