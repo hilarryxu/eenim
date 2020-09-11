@@ -49,6 +49,11 @@ function _M:output_line(text)
   self:output_text(text .. "\n")
 end
 
+function _M:next_cmd_id()
+  self.dwCommand = self.dwCommand + 1
+  return self.dwCommand
+end
+
 ffi.metatype("EE_Context", mt)
 
 return _M

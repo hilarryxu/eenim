@@ -91,10 +91,12 @@ typedef HANDLE HMODULE;
 
 typedef uint32_t DWORD;
 typedef uint32_t UINT;
+typedef uint32_t* UINT_PTR;
 typedef intptr_t LONG_PTR;
 typedef LONG_PTR WPARAM;
 typedef LONG_PTR LPARAM;
 typedef LONG_PTR LRESULT;
+typedef int BOOL;
 typedef int WINBOOL;
 
 typedef struct {
@@ -149,6 +151,9 @@ typedef int (__stdcall *pfnOnRunningCommand)(const wchar_t* command, int length)
 typedef int (*pfnOnAppMessage)(UINT uMsg, WPARAM wp, LPARAM lp);
 
 static const int WM_USER = 1024;
+static const int WM_COMMAND = 0x0111;
+
+static const int ECM_GETPATH = WM_USER + 11;
 static const int ECM_GETCARETPOS = WM_USER + 12;
 static const int ECM_GETLINEBUF = WM_USER + 15;
 
@@ -156,6 +161,7 @@ static const int EEM_GETACTIVETEXT = WM_USER + 3000;
 static const int EEM_LOADFILE = WM_USER + 3002;
 static const int EEM_SETHOOK = WM_USER + 3003;
 static const int EEM_OUTPUTTEXT = WM_USER + 3010;
+static const int EEM_GETFRAMEPATH = WM_USER + 3018;
 
 static const int EEHOOK_RUNCOMMAND = 13;
 static const int EEHOOK_APPMSG = 7;

@@ -38,7 +38,12 @@ function _M:getline(lnum)
   if lnum == "." then
     lnum = self.cursor
   end
-  local wtext = ffi_cast("wchar_t*",  send_message(self.hwnd, C.ECM_GETLINEBUF, lnum - 1))
+  local wtext = ffi_cast("wchar_t*", send_message(self.hwnd, C.ECM_GETLINEBUF, lnum - 1))
+  return unicode.w2a(wtext, C.lstrlenW(wtext))
+end
+
+function _M:get_fullpath()
+  local wtext = ffi_cast("wchar_t*", send_message(self.hwnd, C.ECM_GETPATH))
   return unicode.w2a(wtext, C.lstrlenW(wtext))
 end
 

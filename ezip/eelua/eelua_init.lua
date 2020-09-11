@@ -8,9 +8,11 @@ require"eelua.core"
 require"eelua.stdext"
 require"eelua.utils"
 local base = require"eelua.core.base"
+local Menu = require"eelua.core.Menu"
 local print_r = require"print_r"
 local unicode = require"unicode"
 local path = require"path"
+local lfs = require"lfs"
 
 local C = ffi.C
 local ffi_new = ffi.new
@@ -21,11 +23,32 @@ local _p = eelua.printf
 
 ee_context = ffi_cast("EE_Context*", eelua._ee_context)
 App = ee_context
+
 local app_path_strbuf = base.get_string_buf()
 C.GetModuleFileNameA(ee_context.hModule, app_path_strbuf, base.get_string_buf_size())
 local app_path = path.getdirectory(path.getabsolute(ffi_str(app_path_strbuf)))
 eelua.app_path = app_path
 
+eelua.main_menu = Menu.new(App.hMainMenu)
+eelua.plugin_menu = Menu.new(App.hPluginMenu)
+
+---
+-- init menu
+---
+eelua.scripts = {}
+local script_menu = Menu.new()
+local dir_lua_scripts = path.join(app_path, "eelua/scripts")
+for _, v in ipairs(lfs.walk_dir(dir_lua_scripts)) do
+  local cmd_id = App:next_cmd_id()
+  local snr = str_fmt("SNR_%s", tonumber(cmd_id))
+  eelua.scripts[snr] = v
+  script_menu:add_item(cmd_id, path.getname(v))
+end
+eelua.plugin_menu:add_subitem("lua scripts", script_menu)
+
+---
+-- init hooks
+---
 OnDoFile = function(ctx, rect, wtext)
   local text = unicode.w2a(wtext, C.lstrlenW(wtext))
   -- _p("OnDoFile('%s')", text)
@@ -50,4 +73,20 @@ OnRunningCommand = ffi_cast("pfnOnRunningCommand", function(wcommand, wlen)
   return 0
 end)
 
+OnAppMessage = ffi_cast("pfnOnAppMessage", function(msg, wparam, lparam)
+  if msg == C.WM_COMMAND then
+    local cmd_id = tonumber(wparam)
+    if cmd_id >= 65536 + 40000 then
+      cmd_id = cmd_id - 65536
+    end
+    local snr = str_fmt("SNR_%s", cmd_id)
+    local script_path = eelua.scripts[snr]
+    if script_path then
+      dofile(script_path)
+    end
+  end
+  return 0
+end)
+
 ee_context:set_hook(C.EEHOOK_RUNCOMMAND, OnRunningCommand)
+ee_context:set_hook(C.EEHOOK_APPMSG, OnAppMessage)
