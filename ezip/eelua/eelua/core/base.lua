@@ -128,6 +128,11 @@ typedef struct {
   WINBOOL bAsynMode;
 } EE_LoadFile;
 
+typedef struct {
+  int action;
+  int value;
+} EE_UpdateUIElement;
+
 void free(void *ptr);
 
 LRESULT SendMessageA(
@@ -157,14 +162,29 @@ static const int ECM_GETPATH = WM_USER + 11;
 static const int ECM_GETCARETPOS = WM_USER + 12;
 static const int ECM_GETLINEBUF = WM_USER + 15;
 
+static const int EEM_EXCUTESCRIPT = WM_USER + 1203;
 static const int EEM_GETACTIVETEXT = WM_USER + 3000;
 static const int EEM_LOADFILE = WM_USER + 3002;
 static const int EEM_SETHOOK = WM_USER + 3003;
+static const int EEM_GETFRAMELIST = WM_USER + 3005;
+static const int EEM_UPDATEUIELEMENT = WM_USER + 3009;
 static const int EEM_OUTPUTTEXT = WM_USER + 3010;
 static const int EEM_GETFRAMEPATH = WM_USER + 3018;
+static const int EEM_GETACTIVEFRAME = WM_USER + 3018;
+static const int EEM_SWOWDIALOG = WM_USER + 3021;
 
-static const int EEHOOK_RUNCOMMAND = 13;
 static const int EEHOOK_APPMSG = 7;
+static const int EEHOOK_IDLE = 8;
+static const int EEHOOK_RUNCOMMAND = 13;
+static const int EEHOOK_TEXTIDLE = 27;
+static const int EEHOOK_PREEXECUTESCRIPT = 108;
+
+static const int EEHOOK_RET_DONTROUTE = 0xBC614E;
+
+static const int EE_UI_REMOVE = 0;
+static const int EE_UI_ADD = 1;
+static const int EE_UI_ENABLE = 2;
+static const int EE_UI_SETCHECK = 3;
 ]]
 
 eelua.C = C

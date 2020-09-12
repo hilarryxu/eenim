@@ -12,8 +12,10 @@ local send_message = base.send_message
 local _M = {}
 local mt = {
   __index = function(self, k)
-    if k == 'active_doc' then
+    if k == "active_doc" then
       return _M.get_active_doc(self)
+    elseif k == "frame_count" then
+      return _M.get_frame_count(self)
     end
     return _M[k]
   end
@@ -52,6 +54,31 @@ end
 function _M:next_cmd_id()
   self.dwCommand = self.dwCommand + 1
   return self.dwCommand
+end
+
+function _M:execute_script(script_fn, just_execute)
+  local wstr, wlen = unicode.a2w(script_fn)
+  send_message(self.hMain, C.EEM_EXCUTESCRIPT, wstr, just_execute and 1 or 0)
+end
+
+function _M:get_frame_count()
+  return tonumber(send_message(self.hMain, C.EEM_GETFRAMELIST, 0))
+end
+
+function _M:update_uielement(cmd_id, action, value)
+  local p = ffi_new("EE_UpdateUIElement[1]")
+  p[0].action = action
+  p[0].value = value or 0
+  send_message(self.hMain, C.EEM_UPDATEUIELEMENT, cmd_id, p)
+end
+
+function _M:get_active_frame()
+  local hwnd = ffi_cast("HWND", send_message(self.hMain, C.EEM_GETACTIVEFRAME))
+  return hwnd
+end
+
+function _M:show_dialog(dlg_id, settings)
+  send_message(self.hMain, C.EEM_SWOWDIALOG, dlg_id, settings or "")
 end
 
 ffi.metatype("EE_Context", mt)

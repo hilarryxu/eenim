@@ -243,7 +243,7 @@ const EEM_GETAPPMETRICS* =   WM_USER+3023
 
 
 ## *
-##  EE_UpdateUIElementn.Action
+##  EE_UpdateUIElement.Action
 ##
 
 const
