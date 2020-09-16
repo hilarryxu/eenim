@@ -18,11 +18,27 @@ local _M = {}
 local mt = {
   __index = function(self, k)
     if k == "cursor" then
-      return _M.get_caret_pos(self)
+      return _M.get_cursor(self)
+    elseif k == "fullpath" then
+      return _M.get_fullpath(self)
     elseif k == "linenr" then
       return _M.get_linenr(self)
+    elseif k == "sel_type" then
+      return _M.get_sel_type(self)
+    elseif k == "text" then
+      return _M.gettext(self)
+    elseif k == "sel_text" then
+      return _M.get_sel_text(self)
     end
     return _M[k]
+  end,
+  __newindex = function(self, k, v)
+    if k == "text" then
+      _M.delete(self)
+      _M.insert(self, v)
+    else
+      error("unkown prop " .. k .. " for EE_Document")
+    end
   end
 }
 
@@ -30,7 +46,7 @@ function _M.new(hwnd)
   return ffi_new("EE_Document", { hwnd })
 end
 
-function _M:get_caret_pos()
+function _M:get_cursor()
   local pos_ptr = ffi_new("EC_Pos[1]")
   send_message(self.hwnd, C.ECM_GETCARETPOS, pos_ptr)
   return { pos_ptr[0].line, pos_ptr[1].col }
@@ -137,6 +153,27 @@ function _M:setsel(begin_pos, end_pos)
   epos_ptr[0].col = end_pos[2]
 
   send_message(self.hwnd, C.ECM_SETSEL, bpos_ptr, epos_ptr)
+end
+
+function _M:get_sel_text()
+  local hmem = ffi_cast("HANDLE", send_message(self.hwnd, C.ECM_GETSELTEXT))
+  local wtext = ffi_cast("wchar_t*", C.GlobalLock(hmem))
+  local text = unicode.w2a(wtext, C.lstrlenW(wtext))
+  C.GlobalUnlock(hmem)
+  return text
+end
+
+function _M:get_eol_type()
+  return tonumber(send_message(self.hwnd, C.ECM_SETEOLTYPE, 0x7F))
+end
+
+function _M:set_eol_type(eol_type)
+  return send_message(self.hwnd, C.ECM_SETEOLTYPE, eol_type)
+end
+
+function _M:is_dirty()
+  local val = tonumber(send_message(self.hwnd, C.ECM_ISDOCDIRTY))
+  return val ~= 0
 end
 
 ffi.metatype("EE_Document", mt)

@@ -166,6 +166,14 @@ DWORD GetModuleFileNameA(
   DWORD nSize
 );
 
+void* GlobalLock(
+  HANDLE hMem
+);
+
+BOOL GlobalUnlock(
+  HANDLE hMem
+);
+
 typedef int (__stdcall *pfnOnRunningCommand)(const wchar_t* command, int length);
 typedef int (*pfnOnAppMessage)(UINT uMsg, WPARAM wp, LPARAM lp);
 
@@ -182,9 +190,13 @@ static const int ECM_GETCARETPOS = WM_USER + 12;
 static const int ECM_GETLINEBUF = WM_USER + 15;
 static const int ECM_DELETETEXT = WM_USER + 16;
 static const int ECM_INSERTTEXT = WM_USER + 17;
+static const int ECM_SETEOLTYPE = WM_USER + 18;
+static const int ECM_ISDOCDIRTY = WM_USER + 21;
 static const int ECM_SETSEL = WM_USER + 32;
 static const int ECM_HASSEL = WM_USER + 33;
+static const int ECM_GETSEL = WM_USER + 34;
 static const int ECM_GETTEXT = WM_USER + 35;
+static const int ECM_GETSELTEXT = WM_USER + 40;
 static const int ECM_REDRAW = WM_USER + 74;
 
 static const int EEM_EXCUTESCRIPT = WM_USER + 1203;
