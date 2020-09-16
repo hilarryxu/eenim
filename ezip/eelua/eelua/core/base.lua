@@ -121,6 +121,20 @@ typedef struct {
 } EC_Pos;
 
 typedef struct {
+  int bpos_line;
+  int bpos_col;
+  int epos_line;
+  int epos_col;
+  wchar_t* lpBuffer;
+  int nEol;
+} EC_SelInfo;
+
+typedef struct {
+  wchar_t* wtext;
+  int wlen;
+} EC_InsertText;
+
+typedef struct {
   int nCodepage;
   int nViewType;
   WINBOOL bReadOnly;
@@ -155,12 +169,18 @@ DWORD GetModuleFileNameA(
 typedef int (__stdcall *pfnOnRunningCommand)(const wchar_t* command, int length);
 typedef int (*pfnOnAppMessage)(UINT uMsg, WPARAM wp, LPARAM lp);
 
+static const int INT_MAX = 2147483647;
+static const int INT_MIN = -2147483648;
+
 static const int WM_USER = 1024;
 static const int WM_COMMAND = 0x0111;
 
 static const int ECM_GETPATH = WM_USER + 11;
 static const int ECM_GETCARETPOS = WM_USER + 12;
 static const int ECM_GETLINEBUF = WM_USER + 15;
+static const int ECM_DELETETEXT = WM_USER + 16;
+static const int ECM_INSERTTEXT = WM_USER + 17;
+static const int ECM_GETTEXT = WM_USER + 35;
 
 static const int EEM_EXCUTESCRIPT = WM_USER + 1203;
 static const int EEM_GETACTIVETEXT = WM_USER + 3000;

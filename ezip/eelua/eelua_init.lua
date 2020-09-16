@@ -82,7 +82,10 @@ OnAppMessage = ffi_cast("pfnOnAppMessage", function(msg, wparam, lparam)
     local snr = str_fmt("SNR_%s", cmd_id)
     local script_path = eelua.scripts[snr]
     if script_path then
-      dofile(script_path)
+      local okay, chunk = pcall(dofile, script_path)
+      if not okay then
+        _p("ERR: %s", chunk)
+      end
     end
   end
   return 0
