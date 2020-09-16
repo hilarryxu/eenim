@@ -19,6 +19,8 @@ local mt = {
   __index = function(self, k)
     if k == "cursor" then
       return _M.get_caret_pos(self)
+    elseif k == "linenr" then
+      return _M.get_linenr(self)
     end
     return _M[k]
   end
@@ -101,6 +103,40 @@ function _M:insert_at(line, col, text)
   insert_text_ptr[0].wlen = wlen
 
   send_message(self.hwnd, C.ECM_INSERTTEXT, pos_ptr, insert_text_ptr)
+end
+
+function _M:get_linenr()
+  return tonumber(send_message(self.hwnd, C.ECM_GETLINECNT))
+end
+
+function _M:gotoline(line)
+  send_message(self.hwnd, C.ECM_JUMPTOLINE, line)
+end
+
+function _M:redraw()
+  send_message(self.hwnd, C.ECM_REDRAW)
+end
+
+function _M:send_command(cmd)
+  send_message(self.hwnd, C.WM_COMMAND, cmd)
+end
+
+function _M:get_sel_type()
+  return tonumber(send_message(self.hwnd, C.ECM_HASSEL))
+end
+
+function _M:setsel(begin_pos, end_pos)
+  begin_pos = begin_pos or { 0, 0 }
+  end_pos = end_pos or { C.INT_MAX, C.INT_MAX }
+
+  local bpos_ptr = ffi_new("EC_Pos[1]")
+  bpos_ptr[0].line = begin_pos[1]
+  bpos_ptr[0].col = begin_pos[2]
+  local epos_ptr = ffi_new("EC_Pos[1]")
+  epos_ptr[0].line = end_pos[1]
+  epos_ptr[0].col = end_pos[2]
+
+  send_message(self.hwnd, C.ECM_SETSEL, bpos_ptr, epos_ptr)
 end
 
 ffi.metatype("EE_Document", mt)
