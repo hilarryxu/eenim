@@ -1,6 +1,7 @@
 local ffi = require"ffi"
 local string = require"string"
 local eelua = require"eelua"
+local unicode = require"unicode"
 
 local C = ffi.C
 local ffi_new = ffi.new
@@ -154,10 +155,6 @@ LRESULT SendMessageA(
   UINT   Msg,
   WPARAM wParam,
   LPARAM lParam
-);
-
-int lstrlenW(
-  const wchar_t* lpString
 );
 
 DWORD GetModuleFileNameA(

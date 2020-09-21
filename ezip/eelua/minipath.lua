@@ -1,9 +1,10 @@
-require"eelua.stdext"
 local table = require"table"
+require"eelua.stdext"
 
 local tinsert = table.insert
 local tconcat = table.concat
 
+local DIRSEP = "\\"
 local _M = {}
 
 local function iif(expr, trueval, falseval)
@@ -19,7 +20,7 @@ function _M.isabsolute(p)
 end
 
 function _M.getdirectory(p)
-  local i = p:findlast("/", true)
+  local i = p:findlast("[/\\]", true)
   if i then
     if i > 1 then i = i - 1 end
     return p:sub(1, i)
@@ -73,7 +74,7 @@ function _M.translate(p, sep)
     return result
   else
     if not sep then
-      sep = "/"
+      sep = DIRSEP
     end
     local result = p:gsub("[/\\]", sep)
     return result
@@ -90,7 +91,7 @@ function _M.join(...)
   for i = numargs, 1, -1 do
     local part = select(i, ...)
     if part and #part > 0 and part ~= "." then
-      while part:endswith("/") do
+      while part:endswith(DIRSEP) do
         part = part:sub(1, -2)
       end
 
@@ -101,15 +102,15 @@ function _M.join(...)
     end
   end
 
-  return tconcat(allparts, "/")
+  return tconcat(allparts, DIRSEP)
 end
 
 function _M.getabsolute(p)
-  p = _M.translate(p, "/")
+  p = _M.translate(p, DIRSEP)
   if (p == "") then p = "." end
 
   local result = nil
-  for n, part in ipairs(p:explode("/", true)) do
+  for n, part in ipairs(p:explode(DIRSEP, true)) do
     if (part == "" and n == 1) then
       result = "/"
     elseif (part == "..") then
@@ -118,9 +119,11 @@ function _M.getabsolute(p)
       result = _M.join(result, part)
     end
   end
-  result = iif(result:endswith("/"), result:sub(1, -2), result)
+  result = iif(result:endswith(DIRSEP), result:sub(1, -2), result)
 
   return result
 end
+
+_M.DIRSEP = DIRSEP
 
 return _M

@@ -1,5 +1,5 @@
 local string = require"string"
-local path = require"path"
+local path = require"minipath"
 
 local str_fmt = string.format
 

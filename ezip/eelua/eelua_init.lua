@@ -11,7 +11,7 @@ local base = require"eelua.core.base"
 local Menu = require"eelua.core.Menu"
 local print_r = require"print_r"
 local unicode = require"unicode"
-local path = require"path"
+local path = require"minipath"
 local lfs = require"lfs"
 
 local C = ffi.C
@@ -38,7 +38,7 @@ eelua.plugin_menu = Menu.new(App.hPluginMenu)
 eelua.scripts = {}
 local script_menu = Menu.new()
 local dir_lua_scripts = path.join(app_path, "eelua/scripts")
-for _, v in ipairs(lfs.walk_dir(dir_lua_scripts)) do
+for _, v in ipairs(lfs.list_dir(dir_lua_scripts)) do
   local cmd_id = App:next_cmd_id()
   local snr = str_fmt("SNR_%s", tonumber(cmd_id))
   eelua.scripts[snr] = v

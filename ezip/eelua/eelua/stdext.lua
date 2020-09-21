@@ -1,8 +1,11 @@
 local string = require"string"
 local table = require"table"
 local io = require"io"
+local os = require"os"
 
 local tinsert = table.insert
+local str_fmt = string.format
+local unpack = unpack or table.unpack
 
 function string.startswith(haystack, needle)
   return haystack:find(needle, 1, true) == 1
@@ -131,4 +134,17 @@ function io.writefile(filename, content)
     file:close()
     return true
   end
+end
+
+
+function os.executef(cmd, ...)
+  cmd = str_fmt(cmd, unpack(arg))
+  return os.execute(cmd)
+end
+
+function os.outputof(cmd)
+  local pipe = io.popen(cmd)
+  local result = pipe:read('*a')
+  pipe:close()
+  return result
 end

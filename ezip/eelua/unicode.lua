@@ -18,6 +18,10 @@ int WideCharToMultiByte(unsigned int CodePage,
   const char* lpDefaultChar,
   int* pfUsedDefaultChar
 );
+
+int lstrlenW(
+  const wchar_t* lpString
+);
 ]]
 
 local CP_UTF8 = 65001
