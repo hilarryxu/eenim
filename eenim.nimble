@@ -1,6 +1,6 @@
 # Package
 
-version       = "0.3.0"
+version       = "0.4.0"
 author        = "Larry Xu"
 description   = "Lua plugin sample for everedit written in nim."
 license       = "MIT"

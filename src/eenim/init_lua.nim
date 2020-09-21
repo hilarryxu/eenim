@@ -1,5 +1,5 @@
 import eesdk
-import lua, lua_helper, lfs, leelua
+import lua, lua_helper, leelua
 
 var
   L*: PState
@@ -12,7 +12,6 @@ proc initLua*(context: ptr EE_Context) =
   L = newstate()
   if not isNil(L.pointer):
     L.openlibs
-    L.pop(L.luaopen_lfs())
     discard L.luaopen_eelua()
     L.pushlightuserdata(context)
     L.setfield(-2, "_ee_context")

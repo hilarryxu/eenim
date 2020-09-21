@@ -54,7 +54,7 @@ end
 
 function _M:getline(lnum)
   if lnum == "." then
-    lnum = self.cursor[0]
+    lnum = self.cursor[1]
   end
   local wtext = ffi_cast("wchar_t*", send_message(self.hwnd, C.ECM_GETLINEBUF, lnum))
   return unicode.w2a(wtext, C.lstrlenW(wtext))
