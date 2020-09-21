@@ -137,7 +137,7 @@ function _M.list_dir(pathname, filter, rec)
   tinsert(cmds, str_fmt([["%s"]], pathname))
 
   local s = os.outputof(tconcat(cmds, " "))
-  return string.explode(s, "\n", true))
+  return string.explode(s, "\n", true)
 end
 
 return _M

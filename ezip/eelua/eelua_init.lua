@@ -37,12 +37,14 @@ eelua.plugin_menu = Menu.new(App.hPluginMenu)
 ---
 eelua.scripts = {}
 local script_menu = Menu.new()
-local dir_lua_scripts = path.join(app_path, "eelua/scripts")
+local dir_lua_scripts = path.join(app_path, "eelua\\scripts")
 for _, v in ipairs(lfs.list_dir(dir_lua_scripts)) do
-  local cmd_id = App:next_cmd_id()
-  local snr = str_fmt("SNR_%s", tonumber(cmd_id))
-  eelua.scripts[snr] = v
-  script_menu:add_item(cmd_id, path.getname(v))
+  if string.contains(v, ".lua") then
+    local cmd_id = App:next_cmd_id()
+    local snr = str_fmt("SNR_%s", tonumber(cmd_id))
+    eelua.scripts[snr] = path.join(dir_lua_scripts, v)
+    script_menu:add_item(cmd_id, v)
+  end
 end
 eelua.plugin_menu:add_subitem("lua scripts", script_menu)
 
