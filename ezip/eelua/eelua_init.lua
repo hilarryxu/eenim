@@ -53,7 +53,6 @@ eelua.plugin_menu:add_subitem("lua scripts", script_menu)
 ---
 OnDoFile = function(ctx, rect, wtext)
   local text = unicode.w2a(wtext, C.lstrlenW(wtext))
-  -- _p("OnDoFile('%s')", text)
   local params = string.explode(text, "^^", true)
   local nparams = #params
   assert(nparams > 0)
@@ -61,7 +60,7 @@ OnDoFile = function(ctx, rect, wtext)
   local filepath = path.join(app_path, params[1])
   local okay, chunk = pcall(dofile, filepath)
   if not okay then
-    _p("ERR: %s", chunk)
+    _p("ERR: OnDoFile: %s", chunk)
     return
   end
   if nparams > 1 then
@@ -86,12 +85,22 @@ OnAppMessage = ffi_cast("pfnOnAppMessage", function(msg, wparam, lparam)
     if script_path then
       local okay, chunk = pcall(dofile, script_path)
       if not okay then
-        _p("ERR: %s", chunk)
+        _p("ERR: RunScript: %s", chunk)
       end
     end
   end
   return 0
 end)
 
+OnPreExecuteScript = ffi_cast("pfnOnPreExecuteScript", function(wpathname)
+  local pathname = unicode.w2a(wpathname, C.lstrlenW(wpathname))
+  local okay, chunk = pcall(dofile, pathname)
+  if not okay then
+    _p("ERR: OnPreExecuteScript: %s", chunk)
+  end
+  return 0
+end)
+
 ee_context:set_hook(C.EEHOOK_RUNCOMMAND, OnRunningCommand)
 ee_context:set_hook(C.EEHOOK_APPMSG, OnAppMessage)
+ee_context:set_hook(C.EEHOOK_PREEXECUTESCRIPT, OnPreExecuteScript)

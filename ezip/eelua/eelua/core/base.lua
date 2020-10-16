@@ -173,6 +173,7 @@ BOOL GlobalUnlock(
 
 typedef int (__stdcall *pfnOnRunningCommand)(const wchar_t* command, int length);
 typedef int (*pfnOnAppMessage)(UINT uMsg, WPARAM wp, LPARAM lp);
+typedef int (*pfnOnPreExecuteScript)(const wchar_t* pathname);
 
 static const int INT_MAX = 2147483647;
 static const int INT_MIN = -2147483648;
