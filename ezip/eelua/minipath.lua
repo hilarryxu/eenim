@@ -20,7 +20,7 @@ function _M.isabsolute(p)
 end
 
 function _M.getdirectory(p)
-  local i = p:findlast("[/\\]", true)
+  local i = p:findlast("[/\\]")
   if i then
     if i > 1 then i = i - 1 end
     return p:sub(1, i)
